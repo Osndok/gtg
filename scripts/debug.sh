@@ -6,6 +6,7 @@ if [ $UID -eq 0 ]; then
     exit
 fi
 
+PYTHON_EXE=python3
 args="--no-crash-handler"
 dataset="default"
 norun=0
@@ -31,6 +32,7 @@ done
 if [  $dataset != "default" -a ! -d "./tmp/$dataset" ]
 then
     echo "Copying $dataset dataset to ./tmp/"
+    mkdir -p tmp
     cp -r data/test-data/$dataset tmp/
 fi
 
@@ -41,15 +43,17 @@ export XDG_CONFIG_HOME="./tmp/$dataset/xdg/config"
 
 # Title has to be passed to GTG directly, not through $args
 # title could be more word, and only the first word would be taken
-if [ "$title" = "" ]
+if [ -z "$title" ]
 then
-    title="Dev GTG: $(basename `pwd`)"
+    title="Dev GTG: $(basename $PWD)"
     if [ "$dataset" != "default" ]
     then
         title="$title ($dataset dataset)"
     fi
 fi
 
-if [ $norun -eq 0 ]; then
-    PYTHONPATH=`pwd` ./GTG/gtg $args -t "$title"
+if [ $norun -eq 0 ]
+then
+    PYTHONPATH=$PWD $PYTHON_EXE ./GTG/gtg $args -t "$title"
 fi
+
